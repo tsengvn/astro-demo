@@ -2,4 +2,5 @@
     <string name="app_name">AstroDemo</string>
     <string name="sort_name">Sort by Channel Name</string>
     <string name="sort_number">Sort by Channel Number</string>
+    <string name="add_channel">Add channel</string>
 </resources>

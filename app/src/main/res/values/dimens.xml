@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="content_padding">8dp</dimen>
+    <dimen name="channel_item_height">120dp</dimen>
+    <dimen name="one_hour_width">100dp</dimen>
 </resources>

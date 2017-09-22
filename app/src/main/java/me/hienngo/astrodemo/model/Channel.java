@@ -11,6 +11,7 @@ public class Channel {
     public long channelId;
     public String channelTitle;
     public long channelStbNumber;
+    public String channelCategory;
 
 
     public static class Response extends RawResponse {

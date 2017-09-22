@@ -3,7 +3,6 @@ package me.hienngo.astrodemo.domain.interactor;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.annimon.stream.Stream;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -57,7 +56,7 @@ public class BookmarkManager {
     }
 
     private void saveData(List<Channel> data) {
-        getPreferences().edit().putString("bookmark", gson.toJson(data)).apply();
+        getPreferences().edit().putString("data", gson.toJson(data)).apply();
     }
 
     private List<Channel> getSavedData() {
@@ -75,6 +74,7 @@ public class BookmarkManager {
     }
 
     public void sync(List<Channel> bookmarkedList) {
-        Stream.of(bookmarkedList).forEach(this::add);
+        saveData(bookmarkedList);
+        subject.onNext(bookmarkedList);
     }
 }

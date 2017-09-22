@@ -1,4 +1,4 @@
-package me.hienngo.astrodemo.ui;
+package me.hienngo.astrodemo.ui.list;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -46,7 +46,7 @@ public class ChannelListActivity extends MvpActivity<ChannelListView, ChannelLis
         ((AstroApp)getApplicationContext()).getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.fragment_list_channel);
+        setContentView(R.layout.activity_list_channel);
         getPresenter().loadChannelData();
 
     }

@@ -1,10 +1,9 @@
 package me.hienngo.astrodemo.domain.repo;
 
-import java.util.List;
-
 import me.hienngo.astrodemo.model.Channel;
 import me.hienngo.astrodemo.model.ChannelDetail;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -17,5 +16,5 @@ public interface AstroRepo {
     Observable<Channel.Response> getChannelList();
 
     @GET("ams/v3/getChannels")
-    Observable<List<ChannelDetail>> getChannelsWithMetadata();
+    Observable<ChannelDetail.Response> getChannelsWithMetadata(@Query("channelId") String ids);
 }

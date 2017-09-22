@@ -6,6 +6,7 @@ import me.hienngo.astrodemo.di.component.AppComponent;
 import me.hienngo.astrodemo.di.component.DaggerAppComponent;
 import me.hienngo.astrodemo.di.module.AppModule;
 import me.hienngo.astrodemo.di.module.NetworkModule;
+import timber.log.Timber;
 
 /**
  * @author hienngo
@@ -17,6 +18,7 @@ public class AstroApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Timber.plant(new Timber.DebugTree());
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .networkModule(new NetworkModule())

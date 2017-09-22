@@ -1,4 +1,4 @@
-package me.hienngo.astrodemo.ui;
+package me.hienngo.astrodemo.ui.list;
 
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 

@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        support_version = '24.2.0'
+        support_version = '25.0.0'
     }
 
     repositories {
