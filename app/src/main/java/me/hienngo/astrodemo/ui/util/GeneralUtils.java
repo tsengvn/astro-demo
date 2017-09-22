@@ -1,6 +1,8 @@
 package me.hienngo.astrodemo.ui.util;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 
 import com.annimon.stream.Stream;
 
@@ -51,5 +53,10 @@ public class GeneralUtils {
             }
         };
         Stream.of(recyclerViews).forEach(recyclerView -> recyclerView.addOnScrollListener(scrollListener));
+    }
+
+    public static int convertMinutesToWidth(Context context, long minutes) {
+        //1 min = 1.2 dp
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, minutes*1.2f, context.getResources().getDisplayMetrics());
     }
 }

@@ -3,8 +3,10 @@ package me.hienngo.astrodemo.ui.main;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 import java.util.List;
+import java.util.Map;
 
 import me.hienngo.astrodemo.model.ChannelDetail;
+import me.hienngo.astrodemo.model.ChannelEvent;
 
 /**
  * @author hienngo
@@ -12,5 +14,7 @@ import me.hienngo.astrodemo.model.ChannelDetail;
  */
 
 public interface MainView extends MvpView{
-    public void onReceivedData(List<ChannelDetail> channelDetailList);
+    void onReceivedData(List<ChannelDetail> channelDetailList);
+
+    void onReceivedEvents(Map<Long, List<ChannelEvent>> dataMap, long originTime);
 }

@@ -4,8 +4,11 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
+import java.util.List;
+
 import me.hienngo.astrodemo.domain.interactor.BookmarkManager;
 import me.hienngo.astrodemo.domain.interactor.ChannelManager;
+import me.hienngo.astrodemo.model.ChannelDetail;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -47,5 +50,14 @@ public class MainPresenter extends MvpBasePresenter<MainView> {
             subscription.unsubscribe();
             subscription = null;
         }
+    }
+
+    public void loadEvent(List<ChannelDetail> list) {
+        final long originTime = System.currentTimeMillis();
+        List<Long> idList = Stream.of(list).map(channel -> channel.channelId).collect(Collectors.toList());
+        channelManager.getChannelEventIn24h(idList, originTime)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(dataMap -> getView().onReceivedEvents(dataMap, originTime));
     }
 }

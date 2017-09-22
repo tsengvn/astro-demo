@@ -16,11 +16,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.annimon.stream.Stream;
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -31,6 +33,7 @@ import me.hienngo.astrodemo.R;
 import me.hienngo.astrodemo.domain.interactor.BookmarkManager;
 import me.hienngo.astrodemo.domain.interactor.ChannelManager;
 import me.hienngo.astrodemo.model.ChannelDetail;
+import me.hienngo.astrodemo.model.ChannelEvent;
 import me.hienngo.astrodemo.ui.list.ChannelListActivity;
 import me.hienngo.astrodemo.ui.util.GeneralUtils;
 
@@ -91,13 +94,22 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
             recyclerView1.setAdapter(leftChannelAdapter);
             recyclerView1.addItemDecoration(new DividerItemDecoration(this, OrientationHelper.VERTICAL));
 
-            GeneralUtils.syncVerticalScroll(recyclerView1, recyclerView2);
         } else {
             leftChannelAdapter.setData(channelDetailList);
         }
+        getPresenter().loadEvent(channelDetailList);
     }
 
-    public static class LeftChannelAdapter extends RecyclerView.Adapter<LeftChannelAdapter.ViewHolder> {
+    @Override
+    public void onReceivedEvents(Map<Long, List<ChannelEvent>> dataMap, long originTime) {
+        recyclerView2.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView2.addItemDecoration(new DividerItemDecoration(this, OrientationHelper.VERTICAL));
+        recyclerView2.setAdapter(new RightChannelAdapter(this, leftChannelAdapter.channelDetails, dataMap, originTime));
+
+        GeneralUtils.syncVerticalScroll(recyclerView1, recyclerView2);
+    }
+
+    static class LeftChannelAdapter extends RecyclerView.Adapter<LeftChannelAdapter.ViewHolder> {
         private final Context context;
         private final List<ChannelDetail> channelDetails;
 
@@ -139,6 +151,88 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
                 channelNameView = ButterKnife.findById(itemView, R.id.tvChannelName);
                 channelDescView = ButterKnife.findById(itemView, R.id.tvDescription);
                 logoView = ButterKnife.findById(itemView, R.id.ivLogo);
+            }
+        }
+    }
+
+    static class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapter.ViewHolder>{
+        private final Context context;
+        private final List<ChannelDetail> channelDetails;
+        private final Map<Long, List<ChannelEvent>> eventMap;
+        private long originTime;
+        private List<ChannelEventView> viewSyncScrollList = new ArrayList<>();
+
+        public RightChannelAdapter(Context context, List<ChannelDetail> channelDetails, Map<Long, List<ChannelEvent>> eventMap, long originTime) {
+            this.context = context;
+            this.channelDetails = channelDetails;
+            this.eventMap = eventMap;
+            this.originTime = originTime;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            ChannelEventView channelEventView = new ChannelEventView(context);
+            return new ViewHolder(channelEventView);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            ChannelDetail channelDetail = channelDetails.get(position);
+            ChannelEventView eventView = (ChannelEventView) holder.itemView;
+            eventView.setDataList(originTime, eventMap.get(channelDetail.channelId));
+        }
+
+        @Override
+        public void onViewDetachedFromWindow(ViewHolder holder) {
+            super.onViewDetachedFromWindow(holder);
+            ChannelEventView eventView = (ChannelEventView) holder.itemView;
+            viewSyncScrollList.remove(eventView);
+            eventView.removeOnScrollListener(scrollListener);
+        }
+
+        @Override
+        public void onViewAttachedToWindow(ViewHolder holder) {
+            super.onViewAttachedToWindow(holder);
+            ChannelEventView eventView = (ChannelEventView) holder.itemView;
+            viewSyncScrollList.add(eventView);
+            eventView.addOnScrollListener(scrollListener);
+        }
+
+        @Override
+        public int getItemCount() {
+            return channelDetails.size();
+        }
+
+        RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                Stream.of(viewSyncScrollList)
+                        .filter(other -> other != recyclerView)
+                        .forEach(other -> {
+                            other.removeOnScrollListener(this);
+                            other.scrollBy(dx, 0);
+                            other.addOnScrollListener(this);
+                        });
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    Stream.of(viewSyncScrollList)
+                            .filter(other -> other != recyclerView)
+                            .forEach(other -> {
+                                other.removeOnScrollListener(this);
+                                other.setScrollX(recyclerView.getScrollY());
+                                other.addOnScrollListener(this);
+                            });
+                }
+            }
+        };
+
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            public ViewHolder(View itemView) {
+                super(itemView);
             }
         }
     }
