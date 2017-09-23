@@ -34,7 +34,7 @@ public class MainPresenter extends MvpBasePresenter<MainView> {
                 .observeOn(Schedulers.io())
                 .flatMap(channelManager::getChannelsDetail)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(channelDetails -> getView().onReceivedData(channelDetails),
+                .subscribe(channelDetails -> getView().onReceivedChannelData(channelDetails),
                         throwable -> {
                             Timber.e(throwable, "error in main presenter ");
                             throwable.printStackTrace();
@@ -58,6 +58,6 @@ public class MainPresenter extends MvpBasePresenter<MainView> {
         channelManager.getChannelEventIn24h(idList, originTime)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataMap -> getView().onReceivedEvents(dataMap, originTime));
+                .subscribe(dataMap -> getView().onReceivedEventsData(dataMap, originTime));
     }
 }

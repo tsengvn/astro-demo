@@ -26,18 +26,18 @@ public class GeneralUtils {
                         });
             }
 
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    Stream.of(recyclerViews)
-                            .filter(other -> other != recyclerView)
-                            .forEach(other -> {
-                                other.removeOnScrollListener(this);
-                                other.setScrollY(recyclerView.getScrollY());
-                                other.addOnScrollListener(this);
-                            });
-                }
-            }
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+//                    Stream.of(recyclerViews)
+//                            .filter(other -> other != recyclerView)
+//                            .forEach(other -> {
+//                                other.removeOnScrollListener(this);
+//                                other.setScrollY(recyclerView.getScrollY());
+//                                other.addOnScrollListener(this);
+//                            });
+//                }
+//            }
         };
         Stream.of(recyclerViews).forEach(recyclerView -> recyclerView.addOnScrollListener(scrollListener));
     }
@@ -56,7 +56,6 @@ public class GeneralUtils {
     }
 
     public static int convertMinutesToWidth(Context context, long minutes) {
-        //1 min = 1.2 dp
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, minutes*1.2f, context.getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, minutes*2f, context.getResources().getDisplayMetrics());
     }
 }
