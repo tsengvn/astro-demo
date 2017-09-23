@@ -107,10 +107,11 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
             RightChannelAdapter oldAdapter = (RightChannelAdapter) recyclerView2.getAdapter();
             oldAdapter.clear();
         } else {
+            recyclerView2.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView2.addItemDecoration(new DividerItemDecoration(this, OrientationHelper.VERTICAL));
             GeneralUtils.syncVerticalScroll(recyclerView1, recyclerView2);
         }
-        recyclerView2.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView2.addItemDecoration(new DividerItemDecoration(this, OrientationHelper.VERTICAL));
+
         recyclerView2.setAdapter(new RightChannelAdapter(this, leftChannelAdapter.channelDetails, dataMap, originTime));
 
     }
@@ -170,9 +171,10 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
 
         public RightChannelAdapter(Context context, List<ChannelDetail> channelDetails, Map<Long, List<ChannelEvent>> eventMap, long originTime) {
             this.context = context;
-            this.channelDetails = channelDetails;
+            this.channelDetails = new ArrayList<>();
             this.eventMap = eventMap;
             this.originTime = originTime;
+            this.channelDetails.addAll(channelDetails);
         }
 
         @Override
@@ -238,8 +240,13 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
 
         public void clear() {
             Stream.of(viewSyncScrollList)
-                    .forEach(other -> other.removeOnScrollListener(scrollListener));
+                    .forEach(other -> {
+                        other.removeOnScrollListener(scrollListener);
+                        other.clear();
+                    });
             viewSyncScrollList.clear();
+            channelDetails.clear();
+            notifyDataSetChanged();
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
