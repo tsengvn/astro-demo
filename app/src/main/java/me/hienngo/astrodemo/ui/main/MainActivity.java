@@ -21,6 +21,7 @@ import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,7 @@ import me.hienngo.astrodemo.domain.interactor.BookmarkManager;
 import me.hienngo.astrodemo.domain.interactor.ChannelManager;
 import me.hienngo.astrodemo.model.ChannelDetail;
 import me.hienngo.astrodemo.model.ChannelEvent;
+import me.hienngo.astrodemo.ui.ChannelSort;
 import me.hienngo.astrodemo.ui.Config;
 import me.hienngo.astrodemo.ui.list.ChannelListActivity;
 import me.hienngo.astrodemo.ui.util.GeneralUtils;
@@ -57,6 +59,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
     RecyclerView recyclerView2;
 
     private LeftChannelAdapter leftChannelAdapter;
+    private RightChannelAdapter rightChannelAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,10 +84,26 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_add) {
-            startActivity(new Intent(this, ChannelListActivity.class));
+        switch (item.getItemId()) {
+            case R.id.menu_add:
+                startActivity(new Intent(this, ChannelListActivity.class));
+                return true;
+            case R.id.menu_sort_name:
+                if (leftChannelAdapter != null && rightChannelAdapter != null) {
+                    leftChannelAdapter.sort(ChannelSort.name);
+                    rightChannelAdapter.sort(ChannelSort.name);
+                }
+                return true;
+            case R.id.menu_sort_number:
+                if (leftChannelAdapter != null && rightChannelAdapter != null) {
+                    leftChannelAdapter.sort(ChannelSort.number);
+                    rightChannelAdapter.sort(ChannelSort.number);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+
     }
 
     @Override
@@ -103,16 +122,16 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
 
     @Override
     public void onReceivedEventsData(Map<Long, List<ChannelEvent>> dataMap, long originTime) {
-        if (recyclerView2.getAdapter() != null) {
-            RightChannelAdapter oldAdapter = (RightChannelAdapter) recyclerView2.getAdapter();
-            oldAdapter.clear();
+        if (rightChannelAdapter != null) {
+            rightChannelAdapter = (RightChannelAdapter) recyclerView2.getAdapter();
+            rightChannelAdapter.clear();
         } else {
             recyclerView2.setLayoutManager(new LinearLayoutManager(this));
             recyclerView2.addItemDecoration(new DividerItemDecoration(this, OrientationHelper.VERTICAL));
             GeneralUtils.syncVerticalScroll(recyclerView1, recyclerView2);
         }
-
-        recyclerView2.setAdapter(new RightChannelAdapter(this, leftChannelAdapter.channelDetails, dataMap, originTime));
+        rightChannelAdapter = new RightChannelAdapter(this, leftChannelAdapter.channelDetails, dataMap, originTime);
+        recyclerView2.setAdapter(rightChannelAdapter);
 
     }
 
@@ -147,6 +166,19 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         public void setData(List<ChannelDetail> data) {
             this.channelDetails.clear();
             this.channelDetails.addAll(data);
+            notifyDataSetChanged();
+        }
+
+        public void sort(ChannelSort name) {
+            switch (name) {
+                case name:
+                    Collections.sort(channelDetails, (t1, t2) -> t1.channelTitle.compareTo(t2.channelTitle));
+                    break;
+                case number:
+                    Collections.sort(channelDetails, (t1, t2) -> Long.valueOf(t1.channelStbNumber)
+                            .compareTo(t2.channelStbNumber));
+                    break;
+            }
             notifyDataSetChanged();
         }
 
@@ -246,6 +278,19 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
                     });
             viewSyncScrollList.clear();
             channelDetails.clear();
+            notifyDataSetChanged();
+        }
+
+        public void sort(ChannelSort name) {
+            switch (name) {
+                case name:
+                    Collections.sort(channelDetails, (t1, t2) -> t1.channelTitle.compareTo(t2.channelTitle));
+                    break;
+                case number:
+                    Collections.sort(channelDetails, (t1, t2) -> Long.valueOf(t1.channelStbNumber)
+                            .compareTo(t2.channelStbNumber));
+                    break;
+            }
             notifyDataSetChanged();
         }
 

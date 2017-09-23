@@ -37,8 +37,8 @@ public class ChannelManager {
     }
 
     public Observable<Map<Long, List<ChannelEvent>>> getChannelEventIn24h(List<Long> ids, long startTimeInMils) {
-        final String periodStart = DateUtils.getTimeStamp(startTimeInMils);
-        final String periodEnd = DateUtils.getTimeStamp(startTimeInMils + Config.EVENTS_PAGE_DURATION_IN_MILS);
+        final String periodStart = DateUtils.getTimeStampUTC(startTimeInMils);
+        final String periodEnd = DateUtils.getTimeStampUTC(startTimeInMils + Config.EVENTS_PAGE_DURATION_IN_MILS);
         String idsArray = Stream.of(ids).map(String::valueOf).reduce((id1, id2) -> id1 + "," + id2).orElse("");
 
         return astroRepo.getEvents(idsArray, periodStart, periodEnd)

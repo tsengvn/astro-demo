@@ -25,6 +25,7 @@ import me.hienngo.astrodemo.R;
 import me.hienngo.astrodemo.domain.interactor.BookmarkManager;
 import me.hienngo.astrodemo.domain.interactor.ChannelManager;
 import me.hienngo.astrodemo.model.Channel;
+import me.hienngo.astrodemo.ui.ChannelSort;
 
 /**
  * @author hienngo
@@ -78,10 +79,10 @@ public class ChannelListActivity extends MvpActivity<ChannelListView, ChannelLis
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_sort_name:
-                if (channelAdapter != null) channelAdapter.setSortType(ChannelAdapter.SortType.name);
+                if (channelAdapter != null) channelAdapter.setSortType(ChannelSort.name);
                 return true;
             case R.id.menu_sort_number:
-                if (channelAdapter != null) channelAdapter.setSortType(ChannelAdapter.SortType.number);
+                if (channelAdapter != null) channelAdapter.setSortType(ChannelSort.number);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -98,12 +99,9 @@ public class ChannelListActivity extends MvpActivity<ChannelListView, ChannelLis
     }
 
     public static class ChannelAdapter extends RecyclerView.Adapter<ChannelViewHolder> {
-        enum SortType {
-            name, number;
-        }
         private final Context context;
         private final List<Channel> dataList;
-        private SortType sortType = SortType.name;
+        private ChannelSort sortType = ChannelSort.name;
         private List<Channel> bookmarkedList;
         public ChannelAdapter(Context context, List<Channel> dataList, List<Channel> bookmarkedList) {
             this.context = context;
@@ -140,7 +138,7 @@ public class ChannelListActivity extends MvpActivity<ChannelListView, ChannelLis
             return dataList.size();
         }
 
-        public void setSortType(SortType sortType) {
+        public void setSortType(ChannelSort sortType) {
             this.sortType = sortType;
             sort();
         }
