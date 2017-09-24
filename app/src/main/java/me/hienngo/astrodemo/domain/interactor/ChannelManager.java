@@ -1,7 +1,5 @@
 package me.hienngo.astrodemo.domain.interactor;
 
-import android.graphics.Color;
-
 import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
@@ -96,7 +94,7 @@ public class ChannelManager {
                 //create space
                 if (event.getStartTime() > originTime && event.getEndTime() < endTime) {
                     long spaceDurationInMin = (event.getStartTime() - originTime)/ (1000*60);
-                    dataList.add(new ChannelEventCalendar("Empty", "", spaceDurationInMin, Color.GRAY));
+                    dataList.add(ChannelEventCalendar.empty(spaceDurationInMin));
                 }
 
                 dataList.add(new ChannelEventCalendar(event.programmeTitle, event.displayDateTime, event.getDurationInMinutes()));
@@ -107,7 +105,7 @@ public class ChannelManager {
         if (originTime != endTime) {
             //create space
             long spaceDurationInMin = (endTime - originTime)/ (1000*60);
-            dataList.add(new ChannelEventCalendar("Empty", "", spaceDurationInMin, Color.GRAY));
+            dataList.add(ChannelEventCalendar.empty(spaceDurationInMin));
             originTime = endTime;
         }
         return dataList;

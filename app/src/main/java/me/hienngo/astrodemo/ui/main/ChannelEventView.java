@@ -1,7 +1,6 @@
 package me.hienngo.astrodemo.ui.main;
 
 import android.content.Context;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,7 +24,6 @@ import me.hienngo.astrodemo.ui.util.GeneralUtils;
 public class ChannelEventView extends RecyclerView {
     private List<ChannelEventCalendar> dataList;
     private OnLoadMoreListener loadMoreListener;
-    private int currentSize = 0;
     private Adapter adapter;
     public ChannelEventView(Context context) {
         super(context);
@@ -35,9 +33,14 @@ public class ChannelEventView extends RecyclerView {
     private void init(Context context) {
         dataList = new ArrayList<>();
         int height = context.getResources().getDimensionPixelSize(R.dimen.channel_item_height);
-        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
-        setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL));
+        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height));
+        setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) {
+            @Override
+            protected int getExtraLayoutSpace(State state) {
+                return 0;
+            }
+        });
+//        addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL));
         adapter = new Adapter();
         setAdapter(adapter);
     }
@@ -45,13 +48,7 @@ public class ChannelEventView extends RecyclerView {
     public void setDataList(List<ChannelEventCalendar> dataList) {
         this.dataList.clear();
         this.dataList.addAll(dataList);
-//        if (currentSize != this.dataList.size()) {
-//            adapter.notifyItemRangeInserted(currentSize-1, this.dataList.size()-currentSize);
-//        } else {
-//
-//        }
         adapter.notifyDataSetChanged();
-        currentSize = this.dataList.size();
     }
 
     public void clear() {

@@ -56,6 +56,6 @@ public class GeneralUtils {
     }
 
     public static int convertMinutesToWidth(Context context, long minutes) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, minutes*3f, context.getResources().getDisplayMetrics());
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, minutes*15f, context.getResources().getDisplayMetrics()));
     }
 }

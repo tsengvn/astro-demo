@@ -1,26 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="@dimen/content_padding"
-    android:orientation="vertical"
+    android:background="@drawable/bg_border"
     android:layout_width="wrap_content"
     android:layout_height="@dimen/channel_item_height">
-    <TextView
-        android:id="@+id/tvEventName"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:maxLines="3"
-        android:ellipsize="end"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_border"/>
+    <LinearLayout
+        android:padding="@dimen/content_padding"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tvEventName"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/tvEventTime"
-        android:textSize="12sp"
-        android:textStyle="italic"
-        android:maxLines="3"
-        android:ellipsize="end"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvEventTime"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
+</FrameLayout>

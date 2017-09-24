@@ -28,4 +28,8 @@ public class ChannelEventCalendar {
     public ChannelEventCalendar(String name, String startTime, long durationInMinutes) {
         this(name, startTime, durationInMinutes, Color.WHITE);
     }
+
+    public static ChannelEventCalendar empty(long durationInMinutes) {
+        return new ChannelEventCalendar("", "", durationInMinutes, Color.GRAY);
+    }
 }

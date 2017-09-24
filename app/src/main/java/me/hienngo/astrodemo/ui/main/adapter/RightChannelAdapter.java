@@ -149,6 +149,8 @@ public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapte
                 break;
         }
         notifyDataSetChanged();
+        Stream.of(viewSyncScrollList)
+                .forEach(channelEventView -> channelEventView.scrollToPosition(0));
     }
 
     @Override
