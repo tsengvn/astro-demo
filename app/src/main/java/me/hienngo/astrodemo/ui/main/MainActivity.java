@@ -172,7 +172,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             final ChannelDetail channelDetail = channelDetails.get(position);
-            holder.channelNameView.setText(channelDetail.channelTitle);
+            holder.channelNameView.setText(channelDetail.channelTitle + " " + channelDetail.channelStbNumber);
             holder.channelDescView.setText(channelDetail.channelCategory);
             Picasso.with(context).load(channelDetail.getLogoUrl()).fit().centerInside().into(holder.logoView);
         }
