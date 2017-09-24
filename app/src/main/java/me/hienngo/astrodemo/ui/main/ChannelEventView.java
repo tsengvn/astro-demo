@@ -15,7 +15,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import me.hienngo.astrodemo.R;
 import me.hienngo.astrodemo.model.ChannelEventCalendar;
-import me.hienngo.astrodemo.ui.util.DateUtils;
 import me.hienngo.astrodemo.ui.util.GeneralUtils;
 
 /**
@@ -25,6 +24,9 @@ import me.hienngo.astrodemo.ui.util.GeneralUtils;
 
 public class ChannelEventView extends RecyclerView {
     private List<ChannelEventCalendar> dataList;
+    private OnLoadMoreListener loadMoreListener;
+    private int currentSize = 0;
+    private Adapter adapter;
     public ChannelEventView(Context context) {
         super(context);
         init(context);
@@ -33,28 +35,36 @@ public class ChannelEventView extends RecyclerView {
     private void init(Context context) {
         dataList = new ArrayList<>();
         int height = context.getResources().getDimensionPixelSize(R.dimen.channel_item_height);
-        setOverScrollMode(OVER_SCROLL_NEVER);
-        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height));
+        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
         setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL));
-        setAdapter(new Adapter());
-    }
-
-    public List<ChannelEventCalendar> getDataList() {
-        return dataList;
+        adapter = new Adapter();
+        setAdapter(adapter);
     }
 
     public void setDataList(List<ChannelEventCalendar> dataList) {
-        this.dataList = dataList;
-        getAdapter().notifyDataSetChanged();
+        this.dataList.clear();
+        this.dataList.addAll(dataList);
+//        if (currentSize != this.dataList.size()) {
+//            adapter.notifyItemRangeInserted(currentSize-1, this.dataList.size()-currentSize);
+//        } else {
+//
+//        }
+        adapter.notifyDataSetChanged();
+        currentSize = this.dataList.size();
     }
 
     public void clear() {
         dataList.clear();
-        getAdapter().notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
+    }
+
+    public void setLoadMoreListener(OnLoadMoreListener loadMoreListener) {
+        this.loadMoreListener = loadMoreListener;
     }
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
+//        int[] colors = new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.YELLOW};
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -71,7 +81,11 @@ public class ChannelEventView extends RecyclerView {
                     GeneralUtils.convertMinutesToWidth(getContext(), data.durationInMinutes),
                     height)
             );
+            holder.itemView.setBackgroundColor(data.backgroundColor);
 
+            if (position == dataList.size()-1 && loadMoreListener != null) {
+                loadMoreListener.onLoadMore();
+            }
         }
 
         @Override
@@ -80,6 +94,9 @@ public class ChannelEventView extends RecyclerView {
         }
     }
 
+    public interface OnLoadMoreListener {
+        void onLoadMore();
+    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView textView1, textView2;
@@ -87,21 +104,6 @@ public class ChannelEventView extends RecyclerView {
             super(itemView);
             textView1 = ButterKnife.findById(itemView, R.id.tvEventName);
             textView2 = ButterKnife.findById(itemView, R.id.tvEventTime);
-        }
-    }
-
-
-    private static class Data {
-        String name;
-        String startTime;
-        long durationInMinutes;
-
-        private Data(String name, String startTime, long durationInMinutes) {
-            this.name = name;
-            if (startTime != null && !startTime.equals("")) {
-                this.startTime = DateUtils.getShortTimeStamp(DateUtils.parseUTCDate(startTime));
-            }
-            this.durationInMinutes = durationInMinutes;
         }
     }
 

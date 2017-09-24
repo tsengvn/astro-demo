@@ -22,7 +22,7 @@ public class ChannelEvent extends Channel{
     /**
      * @return time in mils
      */
-    public long getStartTimeInUtc() {
+    public long getStartTime() {
         return DateUtils.parseUTCDate(displayDateTimeUtc);
     }
 
@@ -35,9 +35,9 @@ public class ChannelEvent extends Channel{
         }
     }
 
-    public long getEndTimeInUtc() {
+    public long getEndTime() {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(getStartTimeInUtc());
+        calendar.setTimeInMillis(getStartTime());
         calendar.add(Calendar.MINUTE, getDurationInMinutes());
         return calendar.getTimeInMillis();
     }

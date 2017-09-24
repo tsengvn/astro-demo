@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -33,7 +34,6 @@ import me.hienngo.astrodemo.R;
 import me.hienngo.astrodemo.domain.interactor.BookmarkManager;
 import me.hienngo.astrodemo.domain.interactor.ChannelManager;
 import me.hienngo.astrodemo.model.ChannelDetail;
-import me.hienngo.astrodemo.model.ChannelEvent;
 import me.hienngo.astrodemo.model.ChannelEventCalendar;
 import me.hienngo.astrodemo.ui.ChannelSort;
 import me.hienngo.astrodemo.ui.list.ChannelListActivity;
@@ -60,6 +60,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
 
     private LeftChannelAdapter leftChannelAdapter;
     private RightChannelAdapter rightChannelAdapter;
+    private Snackbar snackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,18 +122,36 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
     }
 
     @Override
-    public void onReceivedCalendarData(Map<Long, List<ChannelEventCalendar>> dataMap, long originTime) {
-        if (rightChannelAdapter != null) {
-            rightChannelAdapter = (RightChannelAdapter) recyclerView2.getAdapter();
+    public void onReceivedCalendarData(Map<Long, List<ChannelEventCalendar>> dataMap, long originTime, boolean loadMore) {
+        if (loadMore) {
+            rightChannelAdapter.onReceiveNextEvents(dataMap);
+        } else if (rightChannelAdapter != null) {
             rightChannelAdapter.clear();
+            rightChannelAdapter = new RightChannelAdapter(this, getPresenter(), leftChannelAdapter.channelDetails, dataMap, originTime);
+            recyclerView2.setAdapter(rightChannelAdapter);
         } else {
             recyclerView2.setLayoutManager(new LinearLayoutManager(this));
             recyclerView2.addItemDecoration(new DividerItemDecoration(this, OrientationHelper.VERTICAL));
             GeneralUtils.syncVerticalScroll(recyclerView1, recyclerView2);
+            rightChannelAdapter = new RightChannelAdapter(this, getPresenter(), leftChannelAdapter.channelDetails, dataMap, originTime);
+            recyclerView2.setAdapter(rightChannelAdapter);
         }
-        rightChannelAdapter = new RightChannelAdapter(this, leftChannelAdapter.channelDetails, dataMap, originTime);
-        recyclerView2.setAdapter(rightChannelAdapter);
 
+
+    }
+
+    @Override
+    public void showLoading() {
+        snackbar = Snackbar.make(findViewById(R.id.root), "Loading", Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
+    }
+
+    @Override
+    public void hideLoading() {
+        if (snackbar != null) {
+            snackbar.dismiss();
+            snackbar = null;
+        }
     }
 
     static class LeftChannelAdapter extends RecyclerView.Adapter<LeftChannelAdapter.ViewHolder> {

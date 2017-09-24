@@ -16,5 +16,10 @@ import me.hienngo.astrodemo.model.ChannelEventCalendar;
 public interface MainView extends MvpView{
     void onReceivedChannelData(List<ChannelDetail> channelDetailList);
 
-    void onReceivedCalendarData(Map<Long, List<ChannelEventCalendar>> dataMap, long originTime);
+    void onReceivedCalendarData(Map<Long, List<ChannelEventCalendar>> dataMap, long originTime, boolean loadMore);
+
+    void showLoading();
+
+    void hideLoading();
+
 }

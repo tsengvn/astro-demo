@@ -15,22 +15,30 @@ import java.util.Map;
 import me.hienngo.astrodemo.model.ChannelDetail;
 import me.hienngo.astrodemo.model.ChannelEventCalendar;
 import me.hienngo.astrodemo.ui.ChannelSort;
+import me.hienngo.astrodemo.ui.Config;
 import me.hienngo.astrodemo.ui.main.ChannelEventView;
+import me.hienngo.astrodemo.ui.main.MainPresenter;
+import timber.log.Timber;
 
 /**
  * @author hienngo
  * @since 9/23/17
  */
 
-public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapter.ViewHolder>{
+public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapter.ViewHolder> implements ChannelEventView.OnLoadMoreListener {
     private final Context context;
-    private final List<ChannelDetail> channelDetails;
-    private final Map<Long, List<ChannelEventCalendar>> eventMap;
+    private final MainPresenter mainPresenter;
+    private List<ChannelDetail> channelDetails;
     private long originTime;
+    private Map<Long, List<ChannelEventCalendar>> eventMap;
     private List<ChannelEventView> viewSyncScrollList = new ArrayList<>();
+    private boolean isLoadingMore = false;
 
-    public RightChannelAdapter(Context context, List<ChannelDetail> channelDetails, Map<Long, List<ChannelEventCalendar>> eventMap, long originTime) {
+    public RightChannelAdapter(Context context,
+                               MainPresenter mainPresenter, List<ChannelDetail> channelDetails,
+                               Map<Long, List<ChannelEventCalendar>> eventMap, long originTime) {
         this.context = context;
+        this.mainPresenter = mainPresenter;
         this.channelDetails = new ArrayList<>();
         this.eventMap = eventMap;
         this.originTime = originTime;
@@ -48,6 +56,8 @@ public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapte
         ChannelDetail channelDetail = channelDetails.get(position);
         ChannelEventView eventView = (ChannelEventView) holder.itemView;
         eventView.setDataList(eventMap.get(channelDetail.channelId));
+        eventView.setLoadMoreListener(this);
+        Timber.i("bind view %s data size %s", position, eventMap.get(channelDetail.channelId).size());
     }
 
     @Override
@@ -69,6 +79,25 @@ public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapte
     @Override
     public int getItemCount() {
         return channelDetails.size();
+    }
+
+    public void loadMoreEvent() {
+        isLoadingMore = true;
+        mainPresenter.loadEvent(channelDetails,
+                originTime + Config.EVENTS_PAGE_DURATION_IN_MILS,
+                true);
+
+    }
+
+    public void onReceiveNextEvents(Map<Long, List<ChannelEventCalendar>> updateEventMap) {
+        for (Long key : eventMap.keySet()) {
+            List<ChannelEventCalendar> eventCalendars = eventMap.get(key);
+            eventCalendars.addAll(updateEventMap.get(key));
+            eventMap.put(key, eventCalendars);
+        }
+        isLoadingMore = false;
+        originTime += Config.EVENTS_PAGE_DURATION_IN_MILS;
+        notifyDataSetChanged();
     }
 
     RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
@@ -120,6 +149,13 @@ public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapte
                 break;
         }
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void onLoadMore() {
+        if (!isLoadingMore) {
+            loadMoreEvent();
+        }
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

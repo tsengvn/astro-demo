@@ -13,29 +13,37 @@ import java.util.TimeZone;
 
 public class DateUtils {
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-    private static final SimpleDateFormat TIME_FORMAT_FULL = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("YYYY-MM-dd HH:mm");
-    private static final SimpleDateFormat SHORT_TIME_FORMAT = new SimpleDateFormat("MM-dd HH:mm", Locale.getDefault());
+    private static final SimpleDateFormat PARSE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat PARSE_TIME_FORMAT_UTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat TIME_STAMP_FORMAT_GMT8 = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+    private static final SimpleDateFormat SHORT_TIME_STAMP_FORMAT = new SimpleDateFormat("MM-dd HH:mm", Locale.getDefault());
 
     static {
-        TIME_FORMAT.setTimeZone(UTC);
+        PARSE_TIME_FORMAT_UTC.setTimeZone(UTC);
+        TIME_STAMP_FORMAT_GMT8.setTimeZone(TimeZone.getTimeZone("GMT+8"));
     }
 
     public static long parseUTCDate(String value) {
         try {
-            return TIME_FORMAT_FULL.parse(value).getTime();
+            return PARSE_TIME_FORMAT_UTC.parse(value).getTime();
         } catch (ParseException e) {
             e.printStackTrace();
             return 0;
         }
     }
 
-    public static String getTimeStampUTC(long timeInMils) {
-        return TIME_FORMAT.format(new Date(timeInMils));
+    public static long parseDate(String value) {
+        try {
+            return PARSE_TIME_FORMAT.parse(value).getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
-    public static String getTimeStampUTC(Date date) {
-        return TIME_FORMAT.format(date);
+
+    public static String getTimeStampInGMT8(long timeInMils) {
+        return TIME_STAMP_FORMAT_GMT8.format(new Date(timeInMils));
     }
 
     /**
@@ -44,6 +52,6 @@ public class DateUtils {
      * @return timestamp 'MM-dd HH:mm' based on device timezone
      */
     public static String getShortTimeStamp(long timeInMils) {
-        return SHORT_TIME_FORMAT.format(timeInMils);
+        return SHORT_TIME_STAMP_FORMAT.format(timeInMils);
     }
 }

@@ -52,12 +52,20 @@ public class MainPresenter extends MvpBasePresenter<MainView> {
         }
     }
 
-    public void loadEvent(List<ChannelDetail> list) {
+    public void loadEvent(final List<ChannelDetail> list) {
         final long originTime = System.currentTimeMillis();
+        loadEvent(list, originTime, false);
+    }
+
+    public void loadEvent(final List<ChannelDetail> list, final long originTime, final boolean loadMore) {
         List<Long> idList = Stream.of(list).map(channel -> channel.channelId).collect(Collectors.toList());
+        getView().showLoading();
         channelManager.getEventCalendarIn24h(idList, originTime)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataMap -> getView().onReceivedCalendarData(dataMap, originTime));
+                .subscribe(dataMap -> {
+                    getView().onReceivedCalendarData(dataMap, originTime, loadMore);
+                    getView().hideLoading();
+                });
     }
 }
