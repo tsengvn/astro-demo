@@ -55,9 +55,9 @@ public class MainPresenter extends MvpBasePresenter<MainView> {
     public void loadEvent(List<ChannelDetail> list) {
         final long originTime = System.currentTimeMillis();
         List<Long> idList = Stream.of(list).map(channel -> channel.channelId).collect(Collectors.toList());
-        channelManager.getChannelEventIn24h(idList, originTime)
+        channelManager.getEventCalendarIn24h(idList, originTime)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataMap -> getView().onReceivedEventsData(dataMap, originTime));
+                .subscribe(dataMap -> getView().onReceivedCalendarData(dataMap, originTime));
     }
 }

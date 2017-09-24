@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.hienngo.astrodemo.model.ChannelDetail;
-import me.hienngo.astrodemo.model.ChannelEvent;
+import me.hienngo.astrodemo.model.ChannelEventCalendar;
 
 /**
  * @author hienngo
@@ -16,5 +16,5 @@ import me.hienngo.astrodemo.model.ChannelEvent;
 public interface MainView extends MvpView{
     void onReceivedChannelData(List<ChannelDetail> channelDetailList);
 
-    void onReceivedEventsData(Map<Long, List<ChannelEvent>> dataMap, long originTime);
+    void onReceivedCalendarData(Map<Long, List<ChannelEventCalendar>> dataMap, long originTime);
 }

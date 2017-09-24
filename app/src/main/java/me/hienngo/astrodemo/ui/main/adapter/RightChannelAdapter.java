@@ -13,9 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import me.hienngo.astrodemo.model.ChannelDetail;
-import me.hienngo.astrodemo.model.ChannelEvent;
+import me.hienngo.astrodemo.model.ChannelEventCalendar;
 import me.hienngo.astrodemo.ui.ChannelSort;
-import me.hienngo.astrodemo.ui.Config;
 import me.hienngo.astrodemo.ui.main.ChannelEventView;
 
 /**
@@ -26,11 +25,11 @@ import me.hienngo.astrodemo.ui.main.ChannelEventView;
 public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapter.ViewHolder>{
     private final Context context;
     private final List<ChannelDetail> channelDetails;
-    private final Map<Long, List<ChannelEvent>> eventMap;
+    private final Map<Long, List<ChannelEventCalendar>> eventMap;
     private long originTime;
     private List<ChannelEventView> viewSyncScrollList = new ArrayList<>();
 
-    public RightChannelAdapter(Context context, List<ChannelDetail> channelDetails, Map<Long, List<ChannelEvent>> eventMap, long originTime) {
+    public RightChannelAdapter(Context context, List<ChannelDetail> channelDetails, Map<Long, List<ChannelEventCalendar>> eventMap, long originTime) {
         this.context = context;
         this.channelDetails = new ArrayList<>();
         this.eventMap = eventMap;
@@ -48,7 +47,7 @@ public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapte
     public void onBindViewHolder(RightChannelAdapter.ViewHolder holder, int position) {
         ChannelDetail channelDetail = channelDetails.get(position);
         ChannelEventView eventView = (ChannelEventView) holder.itemView;
-        eventView.setDataList(originTime, Config.EVENTS_PAGE_DURATION_IN_MINS, eventMap.get(channelDetail.channelId));
+        eventView.setDataList(eventMap.get(channelDetail.channelId));
     }
 
     @Override

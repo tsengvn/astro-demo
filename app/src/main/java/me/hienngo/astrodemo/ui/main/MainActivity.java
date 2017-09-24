@@ -34,6 +34,7 @@ import me.hienngo.astrodemo.domain.interactor.BookmarkManager;
 import me.hienngo.astrodemo.domain.interactor.ChannelManager;
 import me.hienngo.astrodemo.model.ChannelDetail;
 import me.hienngo.astrodemo.model.ChannelEvent;
+import me.hienngo.astrodemo.model.ChannelEventCalendar;
 import me.hienngo.astrodemo.ui.ChannelSort;
 import me.hienngo.astrodemo.ui.list.ChannelListActivity;
 import me.hienngo.astrodemo.ui.main.adapter.RightChannelAdapter;
@@ -120,7 +121,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter> implement
     }
 
     @Override
-    public void onReceivedEventsData(Map<Long, List<ChannelEvent>> dataMap, long originTime) {
+    public void onReceivedCalendarData(Map<Long, List<ChannelEventCalendar>> dataMap, long originTime) {
         if (rightChannelAdapter != null) {
             rightChannelAdapter = (RightChannelAdapter) recyclerView2.getAdapter();
             rightChannelAdapter.clear();

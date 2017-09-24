@@ -11,6 +11,7 @@ import me.hienngo.astrodemo.domain.repo.AstroRepo;
 import me.hienngo.astrodemo.model.Channel;
 import me.hienngo.astrodemo.model.ChannelDetail;
 import me.hienngo.astrodemo.model.ChannelEvent;
+import me.hienngo.astrodemo.model.ChannelEventCalendar;
 import me.hienngo.astrodemo.ui.Config;
 import me.hienngo.astrodemo.ui.util.DateUtils;
 import rx.Observable;
@@ -58,4 +59,53 @@ public class ChannelManager {
                 });
     }
 
+    public Observable<Map<Long, List<ChannelEventCalendar>>> getEventCalendarIn24h(List<Long> ids, long startTimeInMils) {
+        return getChannelEventIn24h(ids, startTimeInMils)
+                .map(rawEventMap -> {
+                    Map<Long, List<ChannelEventCalendar>> eventsCalendarMap = new HashMap<>();
+                    for (Long eventId : rawEventMap.keySet()) {
+                        eventsCalendarMap.put(eventId, mapEventsToCalendar(rawEventMap.get(eventId), startTimeInMils));
+                    }
+                    return eventsCalendarMap;
+                });
+    }
+
+
+    private List<ChannelEventCalendar> mapEventsToCalendar(List<ChannelEvent> sorted, long originTimeInMils) {
+        List<ChannelEventCalendar> dataList = new ArrayList<>();
+        long originTime = originTimeInMils;
+        long endTime = originTimeInMils + Config.EVENTS_PAGE_DURATION_IN_MILS * 60 * 1000;
+        for (ChannelEvent event : sorted) {
+            if (event.getStartTimeInUtc() < originTime && event.getEndTimeInUtc() > originTime) {
+                //event already start before origin time
+                //reduce event duration
+                long durationInMin = (event.getEndTimeInUtc() - originTime) / (1000*60);
+                dataList.add(new ChannelEventCalendar(event.programmeTitle, event.displayDateTime, durationInMin));
+                originTime = event.getEndTimeInUtc();
+            } else if (event.getStartTimeInUtc() == originTime && event.getEndTimeInUtc() < endTime) {
+                dataList.add(new ChannelEventCalendar(event.programmeTitle, event.displayDateTime, event.getDurationInMinutes()));
+                originTime = event.getEndTimeInUtc();
+            } else if (event.getStartTimeInUtc() > originTime && event.getEndTimeInUtc() < endTime) {
+                //create space
+                long spaceDurationInMin = (event.getStartTimeInUtc() - originTime)/ (1000*60);
+                dataList.add(new ChannelEventCalendar("Empty", "", spaceDurationInMin));
+
+                dataList.add(new ChannelEventCalendar(event.programmeTitle, event.displayDateTime, event.getDurationInMinutes()));
+                originTime = event.getEndTimeInUtc();
+            } else if (event.getEndTimeInUtc() > endTime) {
+                //reduce event duration
+                long newDuration = (endTime - event.getStartTimeInUtc()) / (1000*60);
+                dataList.add(new ChannelEventCalendar(event.programmeTitle, event.displayDateTime, newDuration));
+                originTime = endTime;
+            }
+        }
+
+        if (originTime != endTime) {
+            //create space
+            long spaceDurationInMin = (endTime - originTime)/ (1000*60);
+            dataList.add(new ChannelEventCalendar("Empty", "", spaceDurationInMin));
+            originTime = endTime;
+        }
+        return dataList;
+    }
 }

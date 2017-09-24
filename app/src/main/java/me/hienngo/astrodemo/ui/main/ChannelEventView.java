@@ -14,12 +14,9 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import me.hienngo.astrodemo.R;
-import me.hienngo.astrodemo.model.ChannelEvent;
+import me.hienngo.astrodemo.model.ChannelEventCalendar;
 import me.hienngo.astrodemo.ui.util.DateUtils;
 import me.hienngo.astrodemo.ui.util.GeneralUtils;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * @author hienngo
@@ -27,8 +24,7 @@ import rx.schedulers.Schedulers;
  */
 
 public class ChannelEventView extends RecyclerView {
-    private List<Data> dataList;
-    private long originTime;
+    private List<ChannelEventCalendar> dataList;
     public ChannelEventView(Context context) {
         super(context);
         init(context);
@@ -44,56 +40,13 @@ public class ChannelEventView extends RecyclerView {
         setAdapter(new Adapter());
     }
 
-    public void setDataList(long originTimeInMils, long totalDurationInMins, List<ChannelEvent> channelEvents) {
-        this.dataList.clear();
-        getAdapter().notifyDataSetChanged();
-        Observable.from(channelEvents)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .toSortedList((t1, t2) -> Long.valueOf(t1.getStartTimeInUtc()).compareTo(t2.getStartTimeInUtc()))
-                .map(sorted -> mapEventToData(sorted, originTimeInMils, totalDurationInMins))
-                .subscribe(dataList -> {
-                    this.dataList.addAll(dataList);
-                    getAdapter().notifyDataSetChanged();
-                });
+    public List<ChannelEventCalendar> getDataList() {
+        return dataList;
     }
 
-    private List<Data> mapEventToData(List<ChannelEvent> sorted, long originTimeInMils, long totalDurationInMins) {
-        List<Data> dataList = new ArrayList<>();
-        this.originTime = originTimeInMils;
-        long endTime = originTimeInMils + totalDurationInMins * 60 * 1000;
-        for (ChannelEvent event : sorted) {
-            if (event.getStartTimeInUtc() < originTime && event.getEndTimeInUtc() > originTime) {
-                //event already start before origin time
-                //reduce event duration
-                long durationInMin = (event.getEndTimeInUtc() - originTime) / (1000*60);
-                dataList.add(new Data(event.programmeTitle, event.displayDateTime, durationInMin));
-                originTime = event.getEndTimeInUtc();
-            } else if (event.getStartTimeInUtc() == originTime && event.getEndTimeInUtc() < endTime) {
-                dataList.add(new Data(event.programmeTitle, event.displayDateTime, event.getDurationInMinutes()));
-                originTime = event.getEndTimeInUtc();
-            } else if (event.getStartTimeInUtc() > originTime && event.getEndTimeInUtc() < endTime) {
-                //create space
-                long spaceDurationInMin = (event.getStartTimeInUtc() - originTime)/ (1000*60);
-                dataList.add(new Data("Empty", "", spaceDurationInMin));
-
-                dataList.add(new Data(event.programmeTitle, event.displayDateTime, event.getDurationInMinutes()));
-                originTime = event.getEndTimeInUtc();
-            } else if (event.getEndTimeInUtc() > endTime) {
-                //reduce event duration
-                long newDuration = (endTime - event.getStartTimeInUtc()) / (1000*60);
-                dataList.add(new Data(event.programmeTitle, event.displayDateTime, newDuration));
-                originTime = endTime;
-            }
-        }
-
-        if (originTime != endTime) {
-            //create space
-            long spaceDurationInMin = (endTime - originTime)/ (1000*60);
-            dataList.add(new Data("Empty", "", spaceDurationInMin));
-            originTime = endTime;
-        }
-        return dataList;
+    public void setDataList(List<ChannelEventCalendar> dataList) {
+        this.dataList = dataList;
+        getAdapter().notifyDataSetChanged();
     }
 
     public void clear() {
@@ -110,7 +63,7 @@ public class ChannelEventView extends RecyclerView {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            Data data = dataList.get(position);
+            ChannelEventCalendar data = dataList.get(position);
             holder.textView1.setText(data.name);
             holder.textView2.setText(data.startTime);
             int height = getResources().getDimensionPixelSize(R.dimen.channel_item_height);
