@@ -72,7 +72,7 @@ public class ChannelEventView extends RecyclerView {
         public void onBindViewHolder(ViewHolder holder, int position) {
             ChannelEventCalendar data = dataList.get(position);
             holder.textView1.setText(data.name);
-            holder.textView2.setText(data.startTime);
+            holder.textView2.setText(data.startTimeStamp);
             int height = getResources().getDimensionPixelSize(R.dimen.channel_item_height);
             holder.itemView.setLayoutParams(new ViewGroup.LayoutParams(
                     GeneralUtils.convertMinutesToWidth(getContext(), data.durationInMinutes),

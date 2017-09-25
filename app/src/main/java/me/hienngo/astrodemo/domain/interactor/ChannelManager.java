@@ -83,12 +83,12 @@ public class ChannelManager {
                 //event already start before origin time
                 //reduce event duration
                 long durationInMin = (event.getEndTime() - originTime) / (1000*60);
-                dataList.add(new ChannelEventCalendar("On-going: "+ event.programmeTitle, event.displayDateTime, durationInMin));
+                dataList.add(new ChannelEventCalendar("On-going: "+ event.programmeTitle, event.getStartTime(), event.getEndTime(), durationInMin));
                 originTime = event.getEndTime();
             } else if (event.getEndTime() > endTime) {
                 //reduce event duration
                 long newDuration = (endTime - event.getStartTime()) / (1000*60);
-                dataList.add(new ChannelEventCalendar(event.programmeTitle, event.displayDateTime, newDuration));
+                dataList.add(new ChannelEventCalendar(event.programmeTitle, event.getStartTime(), event.getEndTime(), newDuration));
                 originTime = endTime;
             } else {
                 //create space
@@ -97,7 +97,7 @@ public class ChannelManager {
                     dataList.add(ChannelEventCalendar.empty(spaceDurationInMin));
                 }
 
-                dataList.add(new ChannelEventCalendar(event.programmeTitle, event.displayDateTime, event.getDurationInMinutes()));
+                dataList.add(new ChannelEventCalendar(event.programmeTitle, event.getStartTime(), event.getEndTime(), event.getDurationInMinutes()));
                 originTime = event.getEndTime();
             }
         }

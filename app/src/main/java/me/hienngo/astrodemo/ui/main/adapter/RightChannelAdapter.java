@@ -92,12 +92,49 @@ public class RightChannelAdapter extends RecyclerView.Adapter<RightChannelAdapte
     public void onReceiveNextEvents(Map<Long, List<ChannelEventCalendar>> updateEventMap) {
         for (Long key : eventMap.keySet()) {
             List<ChannelEventCalendar> eventCalendars = eventMap.get(key);
-            eventCalendars.addAll(updateEventMap.get(key));
+            mergeEndAndStart(eventCalendars, updateEventMap.get(key));
+//            eventCalendars.addAll();
             eventMap.put(key, eventCalendars);
         }
         isLoadingMore = false;
         originTime += Config.EVENTS_PAGE_DURATION_IN_MILS;
         notifyDataSetChanged();
+    }
+
+    private void mergeEndAndStart(List<ChannelEventCalendar> oldList, List<ChannelEventCalendar> newList) {
+        boolean spaceAtEnd = false, spaceAtStart = false;
+        ChannelEventCalendar lastOldEvent;
+        if (ChannelEventCalendar.isEmpty(oldList.get(oldList.size()-1))) {
+            lastOldEvent = oldList.get(oldList.size()-2);
+            spaceAtEnd = true;
+        } else {
+            lastOldEvent = oldList.get(oldList.size()-1);
+        }
+
+        ChannelEventCalendar firstNewEvent;
+        if (ChannelEventCalendar.isEmpty(newList.get(0))) {
+            firstNewEvent = newList.get(1);
+            spaceAtStart = true;
+        } else {
+            firstNewEvent = newList.get(0);
+        }
+        if (lastOldEvent != null && firstNewEvent != null) {
+
+            if (lastOldEvent.endTimeInMils == firstNewEvent.startTimeInMils) {
+                if (spaceAtEnd) {
+                    long newDurration = (firstNewEvent.startTimeInMils - firstNewEvent.endTimeInMils) / (60 * 1000);
+                    firstNewEvent.durationInMinutes = newDurration;
+                    oldList.remove(oldList.size()-1);
+                } else if (spaceAtStart) {
+                    long newDurration = (lastOldEvent.startTimeInMils - lastOldEvent.endTimeInMils) / (60 * 1000);
+                    lastOldEvent.durationInMinutes = newDurration;
+                    newList.remove(0);
+                } else {
+                    //
+                }
+            }
+        }
+        oldList.addAll(newList);
     }
 
     RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {

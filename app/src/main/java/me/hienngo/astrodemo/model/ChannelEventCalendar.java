@@ -1,6 +1,7 @@
 package me.hienngo.astrodemo.model;
 
 import android.graphics.Color;
+import android.text.TextUtils;
 
 import me.hienngo.astrodemo.ui.util.DateUtils;
 
@@ -12,24 +13,32 @@ import me.hienngo.astrodemo.ui.util.DateUtils;
 
 public class ChannelEventCalendar {
     public String name;
-    public String startTime;
+    public long startTimeInMils;
+    public long endTimeInMils;
+    public String startTimeStamp;
     public long durationInMinutes;
     public int backgroundColor;
 
-    public ChannelEventCalendar(String name, String startTime, long durationInMinutes, int backgroundColor) {
+    public ChannelEventCalendar(String name, long startTime, long endTime, long durationInMinutes, int backgroundColor) {
         this.name = name;
-        if (startTime != null && !startTime.equals("")) {
-            this.startTime = DateUtils.getShortTimeStamp(DateUtils.parseDate(startTime));
+        this.startTimeInMils = startTime;
+        this.endTimeInMils = endTime;
+        if (startTime != 0) {
+            this.startTimeStamp = DateUtils.getShortTimeStamp(startTimeInMils);
         }
-//        this.startTime = startTime;
+
         this.durationInMinutes = durationInMinutes;
         this.backgroundColor = backgroundColor;
     }
-    public ChannelEventCalendar(String name, String startTime, long durationInMinutes) {
-        this(name, startTime, durationInMinutes, Color.WHITE);
+    public ChannelEventCalendar(String name, long startTime, long endTime, long durationInMinutes) {
+        this(name, startTime, endTime, durationInMinutes, Color.WHITE);
     }
 
     public static ChannelEventCalendar empty(long durationInMinutes) {
-        return new ChannelEventCalendar("", "", durationInMinutes, Color.GRAY);
+        return new ChannelEventCalendar("", 0, 0, durationInMinutes, Color.GRAY);
+    }
+
+    public static boolean isEmpty(ChannelEventCalendar eventCalendar) {
+        return TextUtils.isEmpty(eventCalendar.name) && eventCalendar.backgroundColor == Color.GRAY;
     }
 }
